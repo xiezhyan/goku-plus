@@ -17,3 +17,6 @@ export interface UserState {
   certification?: number;
   role: RoleType;
 }
+
+export const TOKEN_NAME = "TOKEN_NAME";
+export const TOKEN_VALUE = "TOKEN_VALUE";
