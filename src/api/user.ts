@@ -2,8 +2,6 @@ import axios from 'axios';
 import type { RouteRecordNormalized } from 'vue-router';
 import { UserState } from '@/store/modules/user/types';
 
-import http from '@/utils/axios/request'
-
 export interface LoginData {
   username: string;
   password: string;
@@ -29,9 +27,5 @@ export function getMenuList() {
 }
 
 export function doLogin(data: LoginData) {
-  return http.request({
-    url: '/user/login',
-    method: 'post',
-    data
-  })
+  return axios.post<LoginRes>('/user/login', data);
 }

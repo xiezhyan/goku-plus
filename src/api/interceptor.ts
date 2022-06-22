@@ -1,13 +1,17 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
-import { getToken } from '@/utils/auth';
+import { getToken, getTokenName } from '@/utils/auth';
 
-export interface HttpResponse<T = unknown> {
-  status: number;
-  msg: string;
-  code: number;
-  data: T;
+interface Meta {
+  success: boolean;
+  message: string;
+  code: number
+}
+
+export interface R<T = unknown> {
+  meta: Meta;
+  data?: T;
 }
 
 if (import.meta.env.VITE_API_BASE_URL) {
@@ -16,16 +20,13 @@ if (import.meta.env.VITE_API_BASE_URL) {
 
 axios.interceptors.request.use(
   (config: AxiosRequestConfig) => {
-    // let each request carry token
-    // this example using the JWT token
-    // Authorization is a custom headers key
-    // please modify it according to the actual situation
     const token = getToken();
+    const tokenName = getTokenName() || "token";
     if (token) {
       if (!config.headers) {
         config.headers = {};
       }
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers[tokenName] = token;
     }
     return config;
   },
@@ -36,24 +37,30 @@ axios.interceptors.request.use(
 );
 // add response interceptors
 axios.interceptors.response.use(
-  (response: AxiosResponse<HttpResponse>) => {
-    const res = response.data;
-    // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
+  (response: AxiosResponse<R>) => {
+    const { data, status, statusText } = response
+    if (status != 200) {
       Message.error({
-        content: res.msg || 'Error',
-        duration: 5 * 1000,
+        content: `出现异常信息, 异常代码:${status}, 异常说明:${statusText}`,
+        duration: 2000
       });
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (
-        [50008, 50012, 50014].includes(res.code) &&
-        response.config.url !== '/api/user/info'
-      ) {
+      return null;
+    }
+
+    const meta = data.meta;
+    if (meta.code === 200) {
+      return data.data;
+    }
+
+    switch (meta.code) {
+      case 1000:  // 没有传入Token
+      case 1001:  // Token过期
+        // response.config.url
         Modal.error({
-          title: 'Confirm logout',
+          title: '重新登录',
           content:
-            'You have been logged out, you can cancel to stay on this page, or log in again',
-          okText: 'Re-Login',
+            '您已登出，您可以取消留在此页面，或重新登录',
+          okText: '重新登录',
           async onOk() {
             const userStore = useUserStore();
 
@@ -61,15 +68,20 @@ axios.interceptors.response.use(
             window.location.reload();
           },
         });
-      }
-      return Promise.reject(new Error(res.msg || 'Error'));
+        break;
+      default:
+        Message.error({
+          content: `出现异常信息, 异常代码:${meta.code}, 异常说明:【${meta.message}】`,
+          duration: 2000
+        })
+        break
     }
-    return res;
+    return Promise.reject(new Error(meta.message || 'Error'));
   },
   (error) => {
     Message.error({
       content: error.msg || 'Request Error',
-      duration: 5 * 1000,
+      duration: 2000,
     });
     return Promise.reject(error);
   }

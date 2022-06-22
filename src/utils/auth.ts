@@ -1,19 +1,29 @@
-const TOKEN_KEY = 'token';
+import { TOKEN_NAME, TOKEN_VALUE } from '@/store/modules/user/types'
 
 const isLogin = () => {
-  return !!localStorage.getItem(TOKEN_KEY);
+  return !!sessionStorage.getItem(TOKEN_VALUE);
 };
 
 const getToken = () => {
-  return localStorage.getItem(TOKEN_KEY);
+  return sessionStorage.getItem(TOKEN_VALUE);
 };
 
 const setToken = (token: string) => {
-  localStorage.setItem(TOKEN_KEY, token);
+  sessionStorage.setItem(TOKEN_VALUE, token);
 };
 
 const clearToken = () => {
-  localStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(TOKEN_VALUE);
+  sessionStorage.removeItem(TOKEN_NAME);
 };
 
-export { isLogin, getToken, setToken, clearToken };
+const getTokenName = () => {
+  return sessionStorage.getItem(TOKEN_NAME);
+}
+
+const setTokenName = (tokenName: string) => {
+  sessionStorage.setItem(TOKEN_NAME || "token", tokenName);
+};
+
+
+export { isLogin, getToken, setToken, clearToken, getTokenName, setTokenName };
