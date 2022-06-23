@@ -4,13 +4,13 @@ import { useUserStore } from '@/store';
 function checkPermission(el: HTMLElement, binding: DirectiveBinding) {
   const { value } = binding;
   const userStore = useUserStore();
-  const { role } = userStore;
+  const { role, permission } = userStore;
 
   if (Array.isArray(value)) {
     if (value.length > 0) {
       const permissionValues = value;
-
-      const hasPermission = permissionValues.includes(role);
+debugger
+      const hasPermission = permissionValues.includes(role) || permission.includes(permissionValues[0]);
       if (!hasPermission && el.parentNode) {
         el.parentNode.removeChild(el);
       }

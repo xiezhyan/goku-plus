@@ -28,6 +28,7 @@ const useUserStore = defineStore('user', {
     accountId: undefined,
     certification: undefined,
     role: '',
+    permission: ['job:get', 'job:save']
   }),
 
   getters: {

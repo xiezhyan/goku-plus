@@ -16,6 +16,7 @@ export interface UserState {
   accountId?: string;
   certification?: number;
   role: RoleType;
+  permission: Array<string>
 }
 
 export const TOKEN_NAME = "TOKEN_NAME";

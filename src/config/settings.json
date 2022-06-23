@@ -12,5 +12,45 @@
   "device": "desktop",
   "tabBar": true,
   "menuFromServer": false,
-  "serverMenu": []
+  "serverMenu": [
+    {
+      "path": "/dashboard",
+      "name": "dashboard",
+      "meta": {
+        "locale": "menu.server.dashboard",
+        "requiresAuth": true,
+        "icon": "icon-dashboard",
+        "order": 1
+      },
+      "children": [
+        {
+          "path": "workplace",
+          "name": "Workplace",
+          "meta": {
+            "locale": "menu.server.workplace",
+            "requiresAuth": true
+          }
+        },
+        {
+          "path": "monitor",
+          "name": "Monitor",
+          "meta": {
+            "locale": "menu.server.monitor",
+            "requiresAuth": true,
+            "roles": [
+              "admin"
+            ]
+          }
+        },
+        {
+          "path": "https://arco.design",
+          "name": "arcoWebsite",
+          "meta": {
+            "locale": "menu.arcoWebsite",
+            "requiresAuth": true
+          }
+        }
+      ]
+    }
+  ]
 }
